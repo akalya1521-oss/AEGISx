@@ -2,7 +2,6 @@ import re
 
 
 def extract_entities(text: str):
-
     # IP addresses
     ip_addresses = re.findall(
         r'\b(?:\d{1,3}\.){3}\d{1,3}\b',
@@ -36,9 +35,7 @@ def extract_entities(text: str):
 
 
 def build_relationships(entities):
-
     relationships = []
-
     all_entities = []
 
     for entity_type, values in entities.items():
@@ -51,7 +48,6 @@ def build_relationships(entities):
     # Connect entities that appear in the same analysis
     for i in range(len(all_entities)):
         for j in range(i + 1, len(all_entities)):
-
             entity_a = all_entities[i]
             entity_b = all_entities[j]
 
@@ -67,15 +63,12 @@ def build_relationships(entities):
 
 
 def build_graph(entities):
-
     nodes = []
     edges = []
 
     # Create graph nodes
     for entity_type, values in entities.items():
-
         for value in values:
-
             nodes.append({
                 "id": value,
                 "type": entity_type
@@ -83,9 +76,7 @@ def build_graph(entities):
 
     # Create graph edges
     for i in range(len(nodes)):
-
         for j in range(i + 1, len(nodes)):
-
             edges.append({
                 "source": nodes[i]["id"],
                 "target": nodes[j]["id"],
@@ -99,7 +90,6 @@ def build_graph(entities):
 
 
 def analyze_data(text: str):
-
     text_lower = text.lower()
 
     suspicious_keywords = [
@@ -124,21 +114,20 @@ def analyze_data(text: str):
         if keyword in text_lower
     ]
 
+    # Calculate risk score
+    keyword_count = len(detected_keywords)
+    risk_score = min(keyword_count * 20, 100)
+
     # Calculate risk level
-    if len(detected_keywords) >= 4:
-
+    if risk_score >= 90:
+        risk_level = "CRITICAL"
+    elif risk_score >= 70:
         risk_level = "HIGH"
-
-    elif len(detected_keywords) >= 2:
-
+    elif risk_score >= 40:
         risk_level = "MEDIUM"
-
-    elif len(detected_keywords) >= 1:
-
+    elif risk_score >= 20:
         risk_level = "LOW"
-
     else:
-
         risk_level = "SAFE"
 
     # Extract entities
@@ -154,8 +143,9 @@ def analyze_data(text: str):
         "input": text,
         "status": "analyzed",
         "risk_level": risk_level,
+        "risk_score": risk_score,
         "detected_keywords": detected_keywords,
-        "keyword_count": len(detected_keywords),
+        "keyword_count": keyword_count,
         "entities": entities,
         "relationships": relationships,
         "graph": graph

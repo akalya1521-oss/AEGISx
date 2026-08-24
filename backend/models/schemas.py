@@ -34,6 +34,7 @@ class AnalysisResponse(BaseModel):
     input: str
     status: str
     risk_level: str
+    risk_score: int
     detected_keywords: List[str]
     keyword_count: int
     entities: Dict[str, List[str]]
