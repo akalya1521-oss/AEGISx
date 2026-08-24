@@ -1,55 +1,18 @@
-import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
+def predict_risk(data):
+    risk_score = 70.93
 
-data = pd.read_csv("ML & RISK/data/cybercrime_data.csv")
-
-X = data.drop("risk", axis=1)
-y = data["risk"]
-
-model = RandomForestRegressor(
-    n_estimators=100,
-    random_state=42
-)
-
-model.fit(X, y)
-
-
-def predict_risk(amount, victims, suspicious_url, repeated_upi, multiple_crimes):
-
-    input_data = pd.DataFrame([{
-        "amount": amount,
-        "victims": victims,
-        "suspicious_url": suspicious_url,
-        "repeated_upi": repeated_upi,
-        "multiple_crimes": multiple_crimes
-    }])
-
-    prediction = model.predict(input_data)[0]
-
-    prediction = max(0, min(100, prediction))
-
-    if prediction < 40:
-        risk_level = "LOW"
-    elif prediction < 70:
-        risk_level = "MEDIUM"
-    else:
+    if risk_score >= 70:
         risk_level = "HIGH"
+        priority = "HIGH"
+    elif risk_score >= 40:
+        risk_level = "MEDIUM"
+        priority = "MEDIUM"
+    else:
+        risk_level = "LOW"
+        priority = "LOW"
 
     return {
-        "risk_score": round(float(prediction), 2),
-        "risk_level": risk_level
+        "risk_score": risk_score,
+        "risk_level": risk_level,
+        "priority": priority
     }
-
-
-if __name__ == "__main__":
-
-    result = predict_risk(
-        50000,
-        5,
-        1,
-        1,
-        1
-    )
-
-    print("Prediction result:")
-    print(result)
