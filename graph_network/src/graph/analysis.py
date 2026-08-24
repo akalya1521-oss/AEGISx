@@ -22,3 +22,9 @@ def find_connection(graph, entity1, entity2):
         return None
     except nx.NodeNotFound:
         return None
+def centrality_analysis(graph):
+    return {
+        "degree": nx.degree_centrality(graph),
+        "betweenness": nx.betweenness_centrality(graph),
+        "closeness": nx.closeness_centrality(graph)
+    }
