@@ -1,6 +1,5 @@
 import networkx as nx
 
-
 class CriminalNetwork:
     def __init__(self):
         self.graph = nx.Graph()

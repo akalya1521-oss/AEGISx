@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aegisx | Live Network</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">AEGISX / INTELLIGENCE CONSOLE</p>
+        <h1>Live Network</h1>
+        <p class="subtitle">Relationships update automatically as new intelligence is recorded.</p>
+      </div>
+      <div class="live-status"><span></span> LIVE <small id="updated-at">Connecting…</small></div>
+    </header>
+
+    <section class="workspace">
+      <div class="graph-card">
+        <div class="graph-toolbar">
+          <span id="network-summary">Loading network…</span>
+          <div class="toolbar-actions">
+            <a class="report-button" href="/reports/case.pdf">Download case report</a>
+            <button id="reset-view" type="button">Reset view</button>
+          </div>
+        </div>
+        <svg id="network" role="img" aria-label="Interactive criminal network graph" viewBox="0 0 1000 650"></svg>
+        <p class="hint">Drag nodes to explore · Select a node for details · Scroll to zoom</p>
+      </div>
+      <aside class="inspector">
+        <p class="eyebrow">NETWORK OVERVIEW</p>
+        <div class="metrics">
+          <div><strong id="entity-count">0</strong><span>Entities</span></div>
+          <div><strong id="relationship-count">0</strong><span>Links</span></div>
+          <div><strong id="type-count">0</strong><span>Types</span></div>
+        </div>
+        <div class="legend">
+          <h2>Entity types</h2>
+          <div><i class="person"></i> Person</div>
+          <div><i class="organization"></i> Organization</div>
+          <div><i class="account"></i> Bank account</div>
+        </div>
+        <div class="details" id="details">
+          <h2>Selection</h2>
+          <p>Select a node to inspect its connections.</p>
+        </div>
+        <section class="insights" id="insights" aria-live="polite">
+          <h2>Intelligence insights</h2>
+          <p>Analysing the network…</p>
+        </section>
+        <section class="timeline" id="timeline" aria-live="polite">
+  <h2>Intelligence timeline</h2>
+  <p>Loading recent intelligence…</p>
+</section>
+      </aside>
+    </section>
+    <section class="operations" aria-label="Network operations">
+      <article class="operation-card">
+        <p class="eyebrow">01 / COLLECT</p>
+        <h2>Add entity</h2>
+        <form id="entity-form">
+          <label>ID <input name="id" placeholder="P004" required></label>
+          <label>Name <input name="name" placeholder="Person D" required></label>
+          <label>Type
+            <select name="type">
+              <option>Person</option>
+              <option>Organization</option>
+              <option>Bank Account</option>
+            </select>
+          </label>
+          <button type="submit">Save entity</button>
+        </form>
+      </article>
+      <article class="operation-card">
+        <p class="eyebrow">02 / CONNECT</p>
+        <h2>Add relationship</h2>
+        <form id="relationship-form">
+          <label>From <select name="source" required></select></label>
+          <label>To <select name="target" required></select></label>
+          <label>Relationship
+            <select name="relation">
+              <option value="associate">Associate</option>
+              <option value="communicates">Communicates</option>
+              <option value="works_for">Works for</option>
+              <option value="owns">Owns</option>
+            </select>
+          </label>
+          <button type="submit">Save relationship</button>
+        </form>
+      </article>
+      <article class="operation-card path-card">
+        <p class="eyebrow">03 / ANALYSE</p>
+        <h2>Trace a connection</h2>
+        <form id="path-form">
+          <label>Start entity <select name="node1" required></select></label>
+          <label>End entity <select name="node2" required></select></label>
+          <button type="submit">Find shortest path</button>
+        </form>
+        <p class="form-status" id="form-status" aria-live="polite">Choose two entities to trace their link.</p>
+      </article>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

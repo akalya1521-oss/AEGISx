@@ -1,0 +1,52 @@
+{
+    "entities": [
+        {
+            "id": "P001",
+            "name": "Person A",
+            "type": "Person"
+        },
+        {
+            "id": "P002",
+            "name": "Person B",
+            "type": "Person"
+        },
+        {
+            "id": "P003",
+            "name": "Person C",
+            "type": "Person"
+        },
+        {
+            "id": "O001",
+            "name": "ABC Organization",
+            "type": "Organization"
+        },
+        {
+            "id": "B001",
+            "name": "Bank Account 101",
+            "type": "Bank Account"
+        }
+    ],
+
+    "relationships": [
+        {
+            "source": "P001",
+            "target": "P002",
+            "relation": "associate"
+        },
+        {
+            "source": "P002",
+            "target": "P003",
+            "relation": "communicates"
+        },
+        {
+            "source": "P002",
+            "target": "O001",
+            "relation": "works_for"
+        },
+        {
+            "source": "P003",
+            "target": "B001",
+            "relation": "owns"
+        }
+    ]
+}
