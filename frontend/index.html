@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AEGISx Cybercrime Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>AEGISx</h1>
+        <p>AI Powered Cybercrime Network Analysis</p>
+    </header>
+
+    <main>
+
+        <div class="search">
+            <input
+                type="text"
+                id="search"
+                placeholder="Search person, phone, UPI or crime..."
+            >
+
+            <button onclick="searchEntity()">
+                Search
+            </button>
+        </div>
+
+        <div class="cards">
+
+            <div class="card">
+                <h2>🚨 Alerts</h2>
+                <p id="alerts">12</p>
+            </div>
+
+            <div class="card">
+                <h2>⚠️ High Risk</h2>
+                <p id="risk">5</p>
+            </div>
+
+            <div class="card">
+                <h2>👥 Entities</h2>
+                <p id="entities">18</p>
+            </div>
+
+        </div>
+
+        <section class="network">
+
+            <h2>🕸️ Cybercrime Network</h2>
+
+            <div class="graph">
+
+                <div class="node">
+                    Person
+                </div>
+
+                <div class="line">
+                    ───
+                </div>
+
+                <div class="node">
+                    UPI
+                </div>
+
+                <div class="line">
+                    ───
+                </div>
+
+                <div class="node">
+                    Crime
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="risk-section">
+
+            <h2>Risk Levels</h2>
+
+            <div class="risk-box high">
+                🔴 HIGH RISK
+            </div>
+
+            <div class="risk-box medium">
+                🟠 MEDIUM RISK
+            </div>
+
+            <div class="risk-box low">
+                🟢 LOW RISK
+            </div>
+
+        </section>
+
+        <p id="result"></p>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
