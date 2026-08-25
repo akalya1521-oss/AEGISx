@@ -1,7 +1,8 @@
+from typing import Any, Dict
 from src.graph.network import CriminalNetwork
 
 
-def validate_data(data):
+def validate_data(data: Dict[str, Any]) -> bool:
     if not isinstance(data, dict):
         raise ValueError("Data must be a dictionary")
 
@@ -57,23 +58,34 @@ def validate_data(data):
     return True
 
 
-def build_network(data):
+def build_network(data: Dict[str, Any]) -> CriminalNetwork:
     validate_data(data)
 
     network = CriminalNetwork()
 
     for entity in data["entities"]:
+        extra = {k: v for k, v in entity.items() if k not in ("id", "name", "type")}
         network.add_entity(
             entity["id"],
             entity["name"],
-            entity["type"]
+            entity["type"],
+            **extra
         )
 
     for relationship in data["relationships"]:
+        extra = {
+            k: v for k, v in relationship.items()
+            if k not in ("source", "target", "relation", "weight", "timestamp", "created_at", "updated_at")
+        }
         network.add_relationship(
             relationship["source"],
             relationship["target"],
-            relationship["relation"]
+            relationship["relation"],
+            weight=relationship.get("weight", 1.0),
+            timestamp=relationship.get("timestamp"),
+            created_at=relationship.get("created_at"),
+            updated_at=relationship.get("updated_at"),
+            **extra
         )
 
     return network

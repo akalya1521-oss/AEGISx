@@ -1,9 +1,11 @@
 import networkx as nx
+from typing import Any, Dict, List, Optional
+from src.graph.centrality import calculate_centrality_metrics
+from src.graph.pattern_detector import detect_structural_patterns
 
 
-def top_influential_nodes(graph, limit=3):
+def top_influential_nodes(graph: nx.Graph, limit: int = 3):
     scores = nx.degree_centrality(graph)
-
     return sorted(
         scores.items(),
         key=lambda x: x[1],
@@ -11,9 +13,10 @@ def top_influential_nodes(graph, limit=3):
     )[:limit]
 
 
-def bridge_nodes(graph, limit=3):
+def bridge_nodes(graph: nx.Graph, limit: int = 3):
+    if graph.number_of_nodes() <= 2:
+        return [(str(n), 0.0) for n in list(graph.nodes())[:limit]]
     scores = nx.betweenness_centrality(graph)
-
     return sorted(
         scores.items(),
         key=lambda x: x[1],
@@ -21,18 +24,18 @@ def bridge_nodes(graph, limit=3):
     )[:limit]
 
 
-def high_risk_nodes(graph, threshold=0.5):
+def high_risk_nodes(graph: nx.Graph, threshold: float = 0.5):
+    if graph.number_of_nodes() == 0:
+        return []
     degree = nx.degree_centrality(graph)
-    betweenness = nx.betweenness_centrality(graph)
+    betweenness = nx.betweenness_centrality(graph) if graph.number_of_nodes() > 2 else {n: 0.0 for n in graph.nodes()}
 
     risk_nodes = []
-
     for node in graph.nodes():
         risk_score = (
-            degree[node] * 0.6
-            + betweenness[node] * 0.4
+            degree.get(node, 0.0) * 0.6
+            + betweenness.get(node, 0.0) * 0.4
         )
-
         if risk_score >= threshold:
             risk_nodes.append({
                 "id": node,
@@ -46,19 +49,19 @@ def high_risk_nodes(graph, threshold=0.5):
     )
 
 
-def explain_risk(graph, node):
+def explain_risk(graph: nx.Graph, node: str):
     if node not in graph:
         return None
 
     degree = nx.degree_centrality(graph)
-    betweenness = nx.betweenness_centrality(graph)
+    betweenness = nx.betweenness_centrality(graph) if graph.number_of_nodes() > 2 else {n: 0.0 for n in graph.nodes()}
 
-    connectivity = round(degree[node] * 100)
-    bridge = round(betweenness[node] * 100)
+    connectivity = round(degree.get(node, 0.0) * 100)
+    bridge = round(betweenness.get(node, 0.0) * 100)
 
     score = round(
-        degree[node] * 0.6 +
-        betweenness[node] * 0.4
+        degree.get(node, 0.0) * 0.6 +
+        betweenness.get(node, 0.0) * 0.4
     * 100)
 
     level = (
@@ -70,37 +73,22 @@ def explain_risk(graph, node):
     )
 
     reasons = []
-
     if connectivity >= 60:
-        reasons.append(
-            "Highly connected entity"
-        )
+        reasons.append("Highly connected entity")
     elif connectivity >= 30:
-        reasons.append(
-            "Moderately connected entity"
-        )
+        reasons.append("Moderately connected entity")
     else:
-        reasons.append(
-            "Limited direct connections"
-        )
+        reasons.append("Limited direct connections")
 
     if bridge >= 60:
-        reasons.append(
-            "Strong bridge influence"
-        )
+        reasons.append("Strong bridge influence")
     elif bridge >= 30:
-        reasons.append(
-            "Moderate bridge influence"
-        )
+        reasons.append("Moderate bridge influence")
     else:
-        reasons.append(
-            "Low bridge influence"
-        )
+        reasons.append("Low bridge influence")
 
     if graph.degree(node) >= 3:
-        reasons.append(
-            "Connects multiple entities"
-        )
+        reasons.append("Connects multiple entities")
 
     return {
         "id": node,
@@ -113,30 +101,22 @@ def explain_risk(graph, node):
     }
 
 
-def risk_assessment(graph):
+def risk_assessment(graph: nx.Graph):
     """Rank every entity using transparent network signals."""
-
     if graph.number_of_nodes() == 0:
         return []
 
     degree = nx.degree_centrality(graph)
-    betweenness = nx.betweenness_centrality(graph)
+    betweenness = nx.betweenness_centrality(graph) if graph.number_of_nodes() > 2 else {n: 0.0 for n in graph.nodes()}
 
     assessment = []
-
     for node in graph.nodes():
-
-        connectivity = round(
-            degree[node] * 100
-        )
-
-        bridge = round(
-            betweenness[node] * 100
-        )
+        connectivity = round(degree.get(node, 0.0) * 100)
+        bridge = round(betweenness.get(node, 0.0) * 100)
 
         score = round(
-            degree[node] * 0.6 +
-            betweenness[node] * 0.4
+            degree.get(node, 0.0) * 0.6 +
+            betweenness.get(node, 0.0) * 0.4
         * 100)
 
         level = (
@@ -163,67 +143,49 @@ def risk_assessment(graph):
     )
 
 
-def network_summary(graph):
+def network_summary(graph: nx.Graph):
+    if graph.number_of_nodes() == 0:
+        return {
+            "total_entities": 0,
+            "total_relationships": 0,
+            "connected_groups": 0,
+            "density": 0.0
+        }
+    undirected_g = graph.to_undirected() if graph.is_directed() else graph
     return {
         "total_entities": graph.number_of_nodes(),
         "total_relationships": graph.number_of_edges(),
-        "connected_groups": nx.number_connected_components(graph),
+        "connected_groups": nx.number_connected_components(undirected_g),
         "density": round(nx.density(graph), 3)
     }
-def suspicious_patterns(graph):
+
+
+def suspicious_patterns(graph: nx.Graph):
+    """Legacy pattern detector adapter."""
     if graph.number_of_nodes() == 0:
         return []
 
-    degree = nx.degree_centrality(graph)
-    betweenness = nx.betweenness_centrality(graph)
+    patterns_detected = detect_structural_patterns(graph)
+    legacy_format = []
 
-    patterns = []
+    for p in patterns_detected:
+        ptype = p["pattern_type"]
+        central = p.get("central_entity")
+        node_name = graph.nodes[central].get("name", central) if central and central in graph else str(central)
 
-    for node in graph.nodes():
-        name = graph.nodes[node].get("name", node)
-        connections = graph.degree(node)
-
-        # High connectivity hub
-        if degree[node] >= 0.5:
-            patterns.append({
+        if ptype == "HUB_AND_SPOKE":
+            legacy_format.append({
                 "type": "High-connectivity hub",
                 "severity": "High",
-                "entity": node,
-                "message": f"{name} has {connections} direct connections"
+                "entity": central,
+                "message": f"{node_name} has {p.get('connection_count', 0)} direct connections"
             })
-
-        # Bridge entity
-        if betweenness[node] >= 0.3:
-            patterns.append({
+        elif ptype == "BRIDGE_PATTERN":
+            legacy_format.append({
                 "type": "Network bridge",
                 "severity": "High",
-                "entity": node,
-                "message": f"{name} connects otherwise separated parts of the network"
+                "entity": central,
+                "message": f"{node_name} connects otherwise separated parts of the network"
             })
 
-        # Moderate connector
-        elif degree[node] >= 0.3:
-            patterns.append({
-                "type": "Key connector",
-                "severity": "Medium",
-                "entity": node,
-                "message": f"{name} has {connections} network connections"
-            })
-
-        # Financial relationship
-        for neighbor in graph.neighbors(node):
-            relation = graph[node][neighbor].get("relation", "").lower()
-            neighbor_type = graph.nodes[neighbor].get("type", "")
-
-            if (
-                relation == "owns"
-                and neighbor_type == "Bank Account"
-            ):
-                patterns.append({
-                    "type": "Financial connection",
-                    "severity": "Medium",
-                    "entity": node,
-                    "message": f"{name} is connected to bank account {neighbor}"
-                })
-
-    return patterns
+    return legacy_format

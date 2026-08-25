@@ -3,139 +3,241 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aegisx | Live Network</title>
+  <title>AEGIS-X | Graph Intelligence Engine (SIH26189)</title>
   <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
   <main class="shell">
+    <!-- Header -->
     <header>
-      <div>
-        <p class="eyebrow">AEGISX / INTELLIGENCE CONSOLE</p>
-        <h1>Live Network</h1>
-        <p class="subtitle">Relationships update automatically as new intelligence is recorded.</p>
+      <div class="header-left">
+        <div class="eyebrow-wrap">
+          <p class="eyebrow">AEGIS-X / GRAPH INTELLIGENCE ENGINE</p>
+          <span class="sih-badge">SIH26189</span>
+        </div>
+        <h1>Live Network Intelligence</h1>
+        <p class="subtitle">Structural topology, role classification, bridge intelligence, and community clusters.</p>
       </div>
-      <div class="live-status"><span></span> LIVE <small id="updated-at">Connecting…</small></div>
+      <div class="header-right">
+        <div class="live-status"><span></span> ENGINE ACTIVE <small id="updated-at">Connecting…</small></div>
+        <a class="report-button" href="/docs" target="_blank">API Docs</a>
+        <a class="report-button pdf-btn" href="/reports/case.pdf">Case Report PDF</a>
+      </div>
     </header>
 
+    <!-- Projector-Ready Highlight KPI Row -->
+    <section class="kpi-row" aria-label="Network Intelligence Highlights">
+      <div class="kpi-card highlight-kpi">
+        <span class="kpi-label">Top Structural Entity <span>★ HUB</span></span>
+        <div class="kpi-value" id="key-entity">—</div>
+        <div class="kpi-sub" id="key-entity-score">Calculating structural score…</div>
+      </div>
+
+      <div class="kpi-card highlight-kpi">
+        <span class="kpi-label">Bridge Connector <span>⚡ BOTTLENECK</span></span>
+        <div class="kpi-value" id="main-bridge">—</div>
+        <div class="kpi-sub" id="main-bridge-sub">Analyzing articulation points…</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Communities</span>
+        <div class="kpi-value" id="cluster-count">0</div>
+        <div class="kpi-sub" id="cluster-sub">Modularity clusters</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Network Patterns</span>
+        <div class="kpi-value" id="pattern-count">0</div>
+        <div class="kpi-sub" id="pattern-sub">Structural motifs detected</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Network Density</span>
+        <div class="kpi-value" id="density-count">0.0</div>
+        <div class="kpi-sub" id="density-sub">0 nodes · 0 edges</div>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Avg Connections</span>
+        <div class="kpi-value" id="avg-degree">0.0</div>
+        <div class="kpi-sub" id="isolate-sub">0 isolated entities</div>
+      </div>
+    </section>
+
+    <!-- Main Workspace (SVG Canvas + Sidebar Inspector) -->
     <section class="workspace">
+      <!-- Left Column: Graph Visualization Canvas -->
       <div class="graph-card">
         <div class="graph-toolbar">
-          <span id="network-summary">Loading network…</span>
+          <span id="network-summary" style="font-weight: 700;">Loading graph topology…</span>
           <div class="toolbar-actions">
-            <a class="report-button" href="/reports/case.pdf">Download case report</a>
-            <button id="reset-view" type="button">Reset view</button>
+            <button id="reset-view" type="button">Reset View</button>
           </div>
         </div>
-        <svg id="network" role="img" aria-label="Interactive criminal network graph" viewBox="0 0 1000 650"></svg>
-        <p class="hint">Drag nodes to explore · Select a node for details · Scroll to zoom</p>
+        <svg id="network" role="img" aria-label="Interactive criminal network graph" viewBox="0 0 1000 600"></svg>
+        <div class="hint">
+          <strong>Interactive Graph:</strong> Drag nodes to reposition · Click any node for structural profile · Scroll wheel to zoom
+        </div>
       </div>
+
+      <!-- Right Column: Graph Intelligence Inspector Sidebar -->
       <aside class="inspector">
-        <p class="eyebrow">NETWORK OVERVIEW</p>
-        <div class="metrics">
-          <div><strong id="entity-count">0</strong><span>Entities</span></div>
-          <div><strong id="relationship-count">0</strong><span>Links</span></div>
-          <div><strong id="type-count">0</strong><span>Types</span></div>
+        <!-- Entity Types Legend -->
+        <div class="legend-box">
+          <div class="section-header" style="margin-bottom: 8px;">
+            <h3 class="section-title">Network Legend</h3>
+            <span class="section-badge" id="type-count-badge">3 TYPES</span>
+          </div>
+          <div class="legend-items">
+            <div><i class="person"></i> Person</div>
+            <div><i class="organization"></i> Organization</div>
+            <div><i class="account"></i> Bank Account</div>
+          </div>
         </div>
-        <div class="legend">
-          <h2>Entity types</h2>
-          <div><i class="person"></i> Person</div>
-          <div><i class="organization"></i> Organization</div>
-          <div><i class="account"></i> Bank account</div>
-        </div>
-        <div class="details" id="details">
-          <h2>Selection</h2>
-          <p>Select a node to inspect its connections.</p>
-        </div>
-        <section class="intelligence-summary" id="intelligence-summary">
-  <h2>Network Intelligence</h2>
 
-  <div class="summary-grid">
-    <div class="summary-item">
-      <span>Overall Risk</span>
-      <strong id="overall-risk">—</strong>
-    </div>
-
-    <div class="summary-item">
-      <span>Key Entity</span>
-      <strong id="key-entity">—</strong>
-    </div>
-
-    <div class="summary-item">
-      <span>Main Bridge</span>
-      <strong id="main-bridge">—</strong>
-    </div>
-
-    <div class="summary-item">
-      <span>Clusters</span>
-      <strong id="cluster-count">0</strong>
-    </div>
-
-    <div class="summary-item">
-      <span>Patterns</span>
-      <strong id="pattern-count">0</strong>
-    </div>
-  </div>
-</section>
-        <section class="insights" id="insights" aria-live="polite">
-          <h2>Intelligence insights</h2>
-          <p>Analysing the network…</p>
+        <!-- Selected Entity Intelligence Profile Details -->
+        <section id="details">
+          <div class="section-header">
+            <h3 class="section-title">Entity Intelligence Profile</h3>
+            <span class="section-badge">SELECTION</span>
+          </div>
+          <div class="empty-state">
+            Click any node in the graph to inspect structural role, betweenness centrality, and explainable graph facts.
+          </div>
         </section>
-        <section class="timeline" id="timeline" aria-live="polite">
-         <h2>Intelligence timeline</h2>
-         <p>Loading recent intelligence…</p>
+
+        <!-- Structural Importance Rankings -->
+        <section id="importance-panel">
+          <div class="section-header">
+            <h3 class="section-title">Structural Importance</h3>
+            <span class="section-badge">CENTRALITY</span>
+          </div>
+          <div class="card-stack" id="importance-list">
+            <div class="empty-state">Evaluating importance rankings…</div>
+          </div>
         </section>
-        <section class="patterns" id="patterns" aria-live="polite">
-         <h2>Suspicious patterns</h2>
-         <p>Scanning network patterns…</p>
+
+        <!-- Community Clusters -->
+        <section id="communities-panel">
+          <div class="section-header">
+            <h3 class="section-title">Community Clusters</h3>
+            <span class="section-badge" id="communities-badge">0 CLUSTERS</span>
+          </div>
+          <div class="card-stack" id="community-list">
+            <div class="empty-state">Detecting communities…</div>
+          </div>
+        </section>
+
+        <!-- Bridge Intelligence & Articulation Points -->
+        <section id="bridges-panel">
+          <div class="section-header">
+            <h3 class="section-title">Bridge Intelligence</h3>
+            <span class="section-badge" id="bridges-badge">0 BRIDGES</span>
+          </div>
+          <div class="card-stack" id="bridge-list">
+            <div class="empty-state">Analyzing structural bridges…</div>
+          </div>
+        </section>
+
+        <!-- Entity Role Classifications -->
+        <section id="roles-panel">
+          <div class="section-header">
+            <h3 class="section-title">Role Classifications</h3>
+            <span class="section-badge">STRUCTURAL</span>
+          </div>
+          <div class="card-stack" id="roles-list">
+            <div class="empty-state">Classifying entity roles…</div>
+          </div>
+        </section>
+
+        <!-- Potential Structural Links -->
+        <section id="potential-links-panel">
+          <div class="section-header">
+            <h3 class="section-title">Potential Structural Links</h3>
+            <span class="section-badge">PROXIMITY</span>
+          </div>
+          <div class="card-stack" id="potential-links-list">
+            <div class="empty-state">Discovering potential structural links…</div>
+          </div>
+        </section>
+
+        <!-- Structural Pattern Detection -->
+        <section id="patterns-section">
+          <div class="section-header">
+            <h3 class="section-title">Structural Patterns</h3>
+            <span class="section-badge" id="patterns-badge">0 PATTERNS</span>
+          </div>
+          <div class="card-stack" id="patterns">
+            <div class="empty-state">Scanning network motifs…</div>
+          </div>
+        </section>
+
+        <!-- Timeline Audit -->
+        <section id="timeline">
+          <div class="section-header">
+            <h3 class="section-title">Intelligence Timeline</h3>
+            <span class="section-badge">AUDIT</span>
+          </div>
+          <div class="card-stack" id="timeline-list">
+            <div class="empty-state">Loading activity…</div>
+          </div>
         </section>
       </aside>
     </section>
+
+    <!-- Full-Width Operational Actions Grid (Spans 100% of Shell Width across Desktop) -->
     <section class="operations" aria-label="Network operations">
+      <!-- 01 / Add Entity -->
       <article class="operation-card">
-        <p class="eyebrow">01 / COLLECT</p>
-        <h2>Add entity</h2>
+        <h2 style="color:#5dc9ff;">01 / Add Entity</h2>
         <form id="entity-form">
-          <label>ID <input name="id" placeholder="P004" required></label>
-          <label>Name <input name="name" placeholder="Person D" required></label>
-          <label>Type
+          <label>Entity ID <input name="id" placeholder="e.g. P005" required></label>
+          <label>Name / Alias <input name="name" placeholder="e.g. Person E" required></label>
+          <label>Entity Type
             <select name="type">
               <option>Person</option>
               <option>Organization</option>
               <option>Bank Account</option>
             </select>
           </label>
-          <button type="submit">Save entity</button>
+          <button type="submit">Save Entity</button>
         </form>
       </article>
+
+      <!-- 02 / Add Relationship -->
       <article class="operation-card">
-        <p class="eyebrow">02 / CONNECT</p>
-        <h2>Add relationship</h2>
+        <h2 style="color:#55efc4;">02 / Add Relationship</h2>
         <form id="relationship-form">
-          <label>From <select name="source" required></select></label>
-          <label>To <select name="target" required></select></label>
-          <label>Relationship
+          <label>From Entity <select name="source" required></select></label>
+          <label>To Entity <select name="target" required></select></label>
+          <label>Relationship Type
             <select name="relation">
               <option value="associate">Associate</option>
               <option value="communicates">Communicates</option>
               <option value="works_for">Works for</option>
               <option value="owns">Owns</option>
+              <option value="funds">Funds</option>
+              <option value="coordinates">Coordinates</option>
             </select>
           </label>
-          <button type="submit">Save relationship</button>
+          <button type="submit">Save Relationship</button>
         </form>
       </article>
+
+      <!-- 03 / Relationship Path Finder -->
       <article class="operation-card path-card">
-        <p class="eyebrow">03 / ANALYSE</p>
-        <h2>Trace a connection</h2>
+        <h2 style="color:#ffd166;">03 / Relationship Path Finder</h2>
         <form id="path-form">
-          <label>Start entity <select name="node1" required></select></label>
-          <label>End entity <select name="node2" required></select></label>
-          <button type="submit">Find shortest path</button>
+          <label>Source Entity <select name="node1" required></select></label>
+          <label>Target Entity <select name="node2" required></select></label>
+          <button type="submit">Find Shortest Path</button>
         </form>
-        <p class="form-status" id="form-status" aria-live="polite">Choose two entities to trace their link.</p>
+        <p class="form-status" id="form-status" aria-live="polite">Choose two entities to trace their structural connection path.</p>
+        <div id="path-results-container"></div>
       </article>
     </section>
   </main>
+
   <script src="/static/app.js"></script>
 </body>
 </html>
