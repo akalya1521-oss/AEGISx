@@ -1,0 +1,430 @@
+:root {
+  /* Dark Intelligence Operations Color Palette */
+  --bg-core: #06090e;
+  --bg-panel: rgba(13, 20, 32, 0.78);
+  --bg-panel-solid: #0d1420;
+  --bg-surface: rgba(18, 28, 46, 0.65);
+  --bg-surface-hover: rgba(28, 42, 68, 0.85);
+  --bg-elevated: #162238;
+  --bg-input: rgba(8, 14, 24, 0.85);
+
+  /* Cyber Glows & Accents */
+  --accent-cyan: #00f0ff;
+  --accent-cyan-dim: rgba(0, 240, 255, 0.15);
+  --accent-cyan-glow: 0 0 16px rgba(0, 240, 255, 0.35);
+  
+  --status-green: #00ff9d;
+  --status-green-dim: rgba(0, 255, 157, 0.15);
+  
+  --warning-amber: #ffb800;
+  --warning-amber-dim: rgba(255, 184, 0, 0.15);
+  
+  --danger-red: #ff3b5c;
+  --danger-red-dim: rgba(255, 59, 92, 0.18);
+  --danger-red-glow: 0 0 16px rgba(255, 59, 92, 0.4);
+
+  --intel-purple: #9d4edd;
+  --intel-purple-dim: rgba(157, 78, 221, 0.18);
+
+  /* Borders & Dividers */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-cyan: rgba(0, 240, 255, 0.25);
+  --border-cyan-active: rgba(0, 240, 255, 0.6);
+  --border-red: rgba(255, 59, 92, 0.35);
+
+  /* Typography Colors */
+  --text-main: #f0f4f8;
+  --text-muted: #8e9fb5;
+  --text-dim: #5a6e85;
+  --text-cyan: #00f0ff;
+  --text-green: #00ff9d;
+  --text-amber: #ffb800;
+  --text-red: #ff3b5c;
+
+  /* Typography Fonts */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, Menlo, monospace;
+  --font-display: 'Chakra Petch', 'Orbitron', sans-serif;
+  --font-orbitron: 'Orbitron', sans-serif;
+
+  /* Transitions & Shadows */
+  --transition-fast: 0.15s ease;
+  --transition-smooth: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 20px rgba(0, 240, 255, 0.18);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-core);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Cyber Matrix Background Grid */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 0),
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 32px 32px, 64px 64px, 64px 64px;
+  background-position: 0 0, 0 0, 0 0;
+  z-index: -2;
+}
+
+/* Subtle Vignette & Scanline */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 30%, transparent 40%, rgba(3, 6, 11, 0.8) 100%);
+  z-index: -1;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(6, 10, 16, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.5);
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 240, 255, 0.3);
+  color: #fff;
+}
+
+/* Common App Layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+.app-main-layout {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 64px);
+  position: relative;
+}
+
+.app-content {
+  flex: 1;
+  padding: 24px;
+  margin-left: 260px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transition: margin-left var(--transition-smooth);
+}
+
+@media (max-width: 1024px) {
+  .app-content {
+    margin-left: 0;
+    padding: 16px;
+  }
+}
+
+/* Common Cyber Glass Panel */
+.cyber-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  box-shadow: var(--shadow-panel);
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.cyber-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+.cyber-panel:hover {
+  border-color: rgba(0, 240, 255, 0.2);
+}
+
+.cyber-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(14, 22, 36, 0.4);
+}
+
+.cyber-panel-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cyber-panel-title-icon {
+  color: var(--accent-cyan);
+}
+
+.cyber-panel-body {
+  padding: 18px;
+}
+
+/* Badges & Tags */
+.threat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.threat-badge.critical {
+  background: var(--danger-red-dim);
+  color: var(--danger-red);
+  border: 1px solid var(--border-red);
+}
+
+.threat-badge.high {
+  background: var(--warning-amber-dim);
+  color: var(--warning-amber);
+  border: 1px solid rgba(255, 184, 0, 0.3);
+}
+
+.threat-badge.medium {
+  background: rgba(0, 240, 255, 0.12);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+}
+
+.threat-badge.low {
+  background: var(--status-green-dim);
+  color: var(--status-green);
+  border: 1px solid rgba(0, 255, 157, 0.25);
+}
+
+.threat-badge.informational {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Cyber Buttons */
+.cyber-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.cyber-btn:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-cyan);
+  color: var(--accent-cyan);
+}
+
+.cyber-btn-primary {
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.cyber-btn-primary:hover {
+  background: var(--accent-cyan);
+  color: #05080e;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.45);
+}
+
+.cyber-btn-danger {
+  background: var(--danger-red-dim);
+  border: 1px solid var(--danger-red);
+  color: var(--danger-red);
+}
+
+.cyber-btn-danger:hover {
+  background: var(--danger-red);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 59, 92, 0.45);
+}
+
+.cyber-btn-sm {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+/* Radar & Pulse Animations */
+@keyframes pulse-cyan {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.4; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(0.95); opacity: 0.9; }
+  50% { transform: scale(1.2); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0.9; }
+}
+
+@keyframes radar-scan {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--status-green);
+  box-shadow: 0 0 8px var(--status-green);
+  animation: pulse-cyan 2s infinite ease-in-out;
+}
+
+.pulse-dot.critical {
+  background: var(--danger-red);
+  box-shadow: 0 0 8px var(--danger-red);
+  animation: pulse-red 1.2s infinite ease-in-out;
+}
+
+.pulse-dot.warning {
+  background: var(--warning-amber);
+  box-shadow: 0 0 8px var(--warning-amber);
+}
+
+/* Page Header Layout */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.page-breadcrumb {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
+.page-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+  text-transform: uppercase;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 780px;
+}
+
+/* Inputs & Search */
+.cyber-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.cyber-input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.cyber-input::placeholder {
+  color: var(--text-dim);
+}
+
+/* Code & Monospace Badges */
+.code-tag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border-subtle);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--text-cyan);
+}

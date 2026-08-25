@@ -1,8 +1,8 @@
 node_modules/
-.vite/
 dist/
-__pycache__/
-*.pyc
-.venv/
-venv/
+.vite/
 .env
+
+backend/venv/
+backend/__pycache__/
+*.pyc
