@@ -5,102 +5,718 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>AEGISx Cybercrime Dashboard</title>
+    <title>AEGISx | Cybercrime Investigation Dashboard</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <header>
-        <h1>AEGISx</h1>
-        <p>AI Powered Cybercrime Network Analysis</p>
+    <!-- =========================
+         TOP NAVIGATION
+    ========================== -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                A
+            </div>
+
+            <div>
+                <h1>AEGISx</h1>
+
+                <span>
+                    AI-Powered Cybercrime Network Analysis
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="system-status">
+
+            <span class="status-dot"></span>
+
+            SYSTEM ONLINE
+
+        </div>
+
     </header>
 
-    <main>
 
-        <div class="search">
-            <input
-                type="text"
-                id="search"
-                placeholder="Search person, phone, UPI or crime..."
-            >
 
-            <button onclick="searchEntity()">
-                Search
-            </button>
-        </div>
+    <!-- =========================
+         MAIN DASHBOARD
+    ========================== -->
 
-        <div class="cards">
+    <main class="dashboard">
 
-            <div class="card">
-                <h2>🚨 Alerts</h2>
-                <p id="alerts">12</p>
+
+        <!-- =========================
+             WELCOME SECTION
+        ========================== -->
+
+        <section class="welcome-section">
+
+            <div>
+
+                <p class="eyebrow">
+                    INVESTIGATOR CONSOLE
+                </p>
+
+                <h2>
+                    Threat Intelligence Dashboard
+                </h2>
+
+                <p class="description">
+                    Monitor suspicious activities, analyze risk levels,
+                    and prioritize cybercrime investigations.
+                </p>
+
             </div>
 
-            <div class="card">
-                <h2>⚠️ High Risk</h2>
-                <p id="risk">5</p>
+
+            <div class="last-updated">
+
+                <span>
+                    LAST ANALYSIS
+                </span>
+
+                <strong>
+                    LIVE
+                </strong>
+
             </div>
 
-            <div class="card">
-                <h2>👥 Entities</h2>
-                <p id="entities">18</p>
+        </section>
+
+
+
+        <!-- =========================
+             RISK SUMMARY CARDS
+        ========================== -->
+
+        <section class="risk-grid">
+
+
+            <!-- Risk Score -->
+
+            <div class="risk-card">
+
+                <div class="card-header">
+
+                    <span>
+                        RISK SCORE
+                    </span>
+
+                    <span class="card-icon">
+                        ◈
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="score-value"
+                    id="riskScore"
+                >
+                    70.93
+                </div>
+
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="riskProgress"
+                    ></div>
+
+                </div>
+
+
+                <p>
+                    AI-generated threat score
+                </p>
+
             </div>
 
-        </div>
 
-        <section class="network">
 
-            <h2>🕸️ Cybercrime Network</h2>
+            <!-- Risk Level -->
 
-            <div class="graph">
+            <div class="risk-card">
 
-                <div class="node">
-                    Person
+                <div class="card-header">
+
+                    <span>
+                        RISK LEVEL
+                    </span>
+
+                    <span class="card-icon">
+                        !
+                    </span>
+
                 </div>
 
-                <div class="line">
-                    ───
+
+                <div
+                    class="risk-value high"
+                    id="riskLevel"
+                >
+                    HIGH
                 </div>
 
-                <div class="node">
-                    UPI
+
+                <p>
+                    Current threat classification
+                </p>
+
+            </div>
+
+
+
+            <!-- Priority -->
+
+            <div class="risk-card">
+
+                <div class="card-header">
+
+                    <span>
+                        PRIORITY
+                    </span>
+
+                    <span class="card-icon">
+                        ⚡
+                    </span>
+
                 </div>
 
-                <div class="line">
-                    ───
+
+                <div
+                    class="risk-value high"
+                    id="priority"
+                >
+                    HIGH
                 </div>
 
-                <div class="node">
-                    Crime
+
+                <p>
+                    Investigation priority
+                </p>
+
+            </div>
+
+
+
+            <!-- Threat Status -->
+
+            <div class="risk-card">
+
+                <div class="card-header">
+
+                    <span>
+                        THREAT STATUS
+                    </span>
+
+                    <span class="card-icon">
+                        ●
+                    </span>
+
+                </div>
+
+
+                <div class="risk-value active">
+                    ACTIVE
+                </div>
+
+
+                <p>
+                    Suspicious activity detected
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             AI ANALYSIS + ALERT CENTER
+        ========================== -->
+
+        <section class="content-grid">
+
+
+            <!-- =========================
+                 AI RISK ASSESSMENT
+            ========================== -->
+
+            <div class="panel">
+
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p class="panel-label">
+                            AI ANALYSIS
+                        </p>
+
+                        <h3>
+                            Risk Assessment
+                        </h3>
+
+                    </div>
+
+
+                    <span class="badge high-badge">
+                        HIGH RISK
+                    </span>
+
+                </div>
+
+
+
+                <div class="assessment">
+
+
+                    <!-- Animated Risk Circle -->
+
+                    <div
+                        class="score-circle"
+                        id="scoreCircle"
+                    >
+
+                        <div class="circle-content">
+
+                            <span id="circleScore">
+                                0
+                            </span>
+
+                            <small>
+                                / 100
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Assessment Details -->
+
+                    <div class="assessment-text">
+
+                        <h4>
+                            Suspicious activity detected
+                        </h4>
+
+
+                        <p id="riskReason">
+                            Multiple suspicious indicators detected
+                        </p>
+
+
+
+                        <div class="indicator">
+
+                            <span>
+                                Threat confidence
+                            </span>
+
+                            <strong id="threatConfidence">
+                                High
+                            </strong>
+
+                        </div>
+
+
+
+                        <div class="indicator">
+
+                            <span>
+                                Recommended action
+                            </span>
+
+                            <strong id="recommendedAction">
+                                Investigate
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 ALERT CENTER
+            ========================== -->
+
+            <div class="panel alert-panel">
+
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p class="panel-label">
+                            ALERT CENTER
+                        </p>
+
+                        <h3>
+                            Priority Alerts
+                        </h3>
+
+                    </div>
+
+
+                    <span class="alert-count">
+                        03
+                    </span>
+
+                </div>
+
+
+
+                <div class="alert-list">
+
+
+                    <div class="alert-item">
+
+                        <span class="alert-indicator"></span>
+
+
+                        <div>
+
+                            <strong>
+                                High-risk activity
+                            </strong>
+
+                            <p>
+                                Risk score exceeded investigation threshold.
+                            </p>
+
+                        </div>
+
+
+                        <span class="alert-time">
+                            NOW
+                        </span>
+
+                    </div>
+
+
+
+                    <div class="alert-item">
+
+                        <span class="alert-indicator"></span>
+
+
+                        <div>
+
+                            <strong>
+                                Suspicious pattern
+                            </strong>
+
+                            <p>
+                                Multiple indicators detected by AI model.
+                            </p>
+
+                        </div>
+
+
+                        <span class="alert-time">
+                            2m
+                        </span>
+
+                    </div>
+
+
+
+                    <div class="alert-item">
+
+                        <span class="alert-indicator"></span>
+
+
+                        <div>
+
+                            <strong>
+                                Priority escalation
+                            </strong>
+
+                            <p>
+                                Investigation priority classified as HIGH.
+                            </p>
+
+                        </div>
+
+
+                        <span class="alert-time">
+                            5m
+                        </span>
+
+                    </div>
+
                 </div>
 
             </div>
 
         </section>
 
-        <section class="risk-section">
 
-            <h2>Risk Levels</h2>
 
-            <div class="risk-box high">
-                🔴 HIGH RISK
+        <!-- =========================
+             NETWORK INTELLIGENCE
+        ========================== -->
+
+        <section class="panel network-panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <p class="panel-label">
+                        NETWORK INTELLIGENCE
+                    </p>
+
+                    <h3>
+                        Cybercrime Relationship Graph
+                    </h3>
+
+                </div>
+
+
+                <span class="coming-badge">
+                    GRAPH ENGINE
+                </span>
+
             </div>
 
-            <div class="risk-box medium">
-                🟠 MEDIUM RISK
-            </div>
 
-            <div class="risk-box low">
-                🟢 LOW RISK
+
+            <div class="network-placeholder">
+
+
+                <!-- Central Node -->
+
+                <div class="network-node node-center">
+                    A
+                </div>
+
+
+                <!-- Connected Nodes -->
+
+                <div class="network-node node-one">
+                    U
+                </div>
+
+
+                <div class="network-node node-two">
+                    C
+                </div>
+
+
+                <div class="network-node node-three">
+                    T
+                </div>
+
+
+
+                <!-- Connections -->
+
+                <div class="network-line line-one"></div>
+
+                <div class="network-line line-two"></div>
+
+                <div class="network-line line-three"></div>
+
+
+
+                <!-- Graph Information -->
+
+                <div class="network-info">
+
+                    <strong>
+                        Network Visualization
+                    </strong>
+
+                    <span>
+                        Relationship data will be connected here
+                        after the graph-analysis module is integrated.
+                    </span>
+
+                </div>
+
             </div>
 
         </section>
 
-        <p id="result"></p>
+
+
+        <!-- =========================
+             INVESTIGATION ACTIVITY
+        ========================== -->
+
+        <section class="panel">
+
+
+            <div class="panel-header">
+
+                <div>
+
+                    <p class="panel-label">
+                        INVESTIGATION LOG
+                    </p>
+
+                    <h3>
+                        Recent Suspicious Activities
+                    </h3>
+
+                </div>
+
+
+                <button class="view-button">
+                    VIEW ALL
+                </button>
+
+            </div>
+
+
+
+            <div class="activity-table">
+
+
+                <!-- Table Header -->
+
+                <div class="table-row table-heading">
+
+                    <span>
+                        ACTIVITY
+                    </span>
+
+                    <span>
+                        TYPE
+                    </span>
+
+                    <span>
+                        RISK
+                    </span>
+
+                    <span>
+                        PRIORITY
+                    </span>
+
+                </div>
+
+
+
+                <!-- Activity 1 -->
+
+                <div class="table-row">
+
+                    <span>
+                        Repeated transaction pattern
+                    </span>
+
+                    <span>
+                        Financial
+                    </span>
+
+                    <span class="risk-high">
+                        HIGH
+                    </span>
+
+                    <span class="priority-high">
+                        HIGH
+                    </span>
+
+                </div>
+
+
+
+                <!-- Activity 2 -->
+
+                <div class="table-row">
+
+                    <span>
+                        Suspicious URL detected
+                    </span>
+
+                    <span>
+                        Cyber Threat
+                    </span>
+
+                    <span class="risk-high">
+                        HIGH
+                    </span>
+
+                    <span class="priority-high">
+                        HIGH
+                    </span>
+
+                </div>
+
+
+
+                <!-- Activity 3 -->
+
+                <div class="table-row">
+
+                    <span>
+                        Multiple crime indicators
+                    </span>
+
+                    <span>
+                        Network
+                    </span>
+
+                    <span class="risk-medium">
+                        MEDIUM
+                    </span>
+
+                    <span class="priority-medium">
+                        MEDIUM
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
 
     </main>
+
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer>
+
+        <span>
+            AEGISx Security Intelligence Platform
+        </span>
+
+        <span>
+            AI Risk Engine v1.0
+        </span>
+
+    </footer>
+
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
 
     <script src="script.js"></script>
 

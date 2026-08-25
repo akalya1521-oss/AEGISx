@@ -1,96 +1,132 @@
-async function analyzeNetwork() {
-    const input = document.getElementById("networkInput").value;
-    const result = document.getElementById("result");
+const riskData = {
+    risk_score: 70.93,
+    risk_level: "HIGH",
+    priority: "HIGH",
+    reason: "Multiple suspicious indicators detected"
+};
 
-    if (input.trim() === "") {
-        result.style.display = "block";
-        result.innerHTML = `
-            <h3>Input Required</h3>
-            <p>Please enter a network or threat description.</p>
-        `;
+
+function updateRiskDashboard(data) {
+
+    const riskScore = document.getElementById("riskScore");
+    const circleScore = document.getElementById("circleScore");
+    const riskLevel = document.getElementById("riskLevel");
+    const priority = document.getElementById("priority");
+    const riskReason = document.getElementById("riskReason");
+    const riskProgress = document.getElementById("riskProgress");
+
+
+    if (riskScore) {
+        riskScore.textContent = data.risk_score;
+    }
+
+    if (circleScore) {
+        circleScore.textContent = data.risk_score;
+    }
+
+    if (riskLevel) {
+        riskLevel.textContent = data.risk_level;
+    }
+
+    if (priority) {
+        priority.textContent = data.priority;
+    }
+
+    if (riskReason) {
+        riskReason.textContent = data.reason;
+    }
+
+    if (riskProgress) {
+        riskProgress.style.width = `${data.risk_score}%`;
+    }
+}
+
+
+function updateRiskStatus(level) {
+
+    const riskLevel = document.getElementById("riskLevel");
+
+    if (!riskLevel) {
         return;
     }
 
-    result.style.display = "block";
+    riskLevel.classList.remove("high", "medium", "low");
 
-    result.innerHTML = `
-        <h3>Analyzing...</h3>
-        <p>Please wait while AEGISx analyzes the threat.</p>
-    `;
-
-    try {
-        const response = await fetch(
-            "http://127.0.0.1:8001/api/analysis/analyze",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    text: input
-                })
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        result.innerHTML = `
-            <h3>Analysis Result</h3>
-
-            <p>
-                <strong>Input:</strong>
-                ${data.input}
-            </p>
-
-            <p>
-                <strong>Risk Level:</strong>
-                ${data.risk_level}
-            </p>
-
-            <p>
-                <strong>Status:</strong>
-                ${data.status}
-            </p>
-
-            <p>
-                <strong>Detected Keywords:</strong>
-                ${data.detected_keywords.length > 0
-                    ? data.detected_keywords.join(", ")
-                    : "None"}
-            </p>
-
-            <h4>Relationships</h4>
-
-            ${
-                data.relationships.length > 0
-                    ? data.relationships.map(rel => `
-                        <p>
-                            <strong>${rel.source}</strong>
-                            → ${rel.relationship} →
-                            <strong>${rel.target}</strong>
-                        </p>
-                    `).join("")
-                    : "<p>No relationships detected.</p>"
-            }
-        `;
-
-    } catch (error) {
-
-        console.error("Analysis Error:", error);
-
-        result.innerHTML = `
-            <h3>Connection Error</h3>
-            <p>
-                Unable to connect to the AEGISx backend.
-            </p>
-            <p>
-                Make sure the FastAPI server is running on
-                <strong>http://127.0.0.1:8001</strong>
-            </p>
-        `;
+    if (level === "HIGH") {
+        riskLevel.classList.add("high");
+    } 
+    else if (level === "MEDIUM") {
+        riskLevel.classList.add("medium");
+    } 
+    else {
+        riskLevel.classList.add("low");
     }
 }
+
+
+updateRiskDashboard(riskData);
+updateRiskStatus(riskData.risk_level);
+function createRiskAlert(data) {
+
+    const alertList = document.querySelector(".alert-list");
+    const alertCount = document.querySelector(".alert-count");
+
+    if (!alertList) {
+        return;
+    }
+
+    alertList.innerHTML = "";
+
+    const alerts = [];
+
+    if (data.risk_level === "HIGH") {
+        alerts.push({
+            title: "High-risk activity detected",
+            message: `AI risk score reached ${data.risk_score}. Immediate investigation recommended.`,
+            time: "NOW"
+        });
+    }
+
+    if (data.priority === "HIGH") {
+        alerts.push({
+            title: "Priority escalation",
+            message: "This activity has been classified as HIGH priority.",
+            time: "NOW"
+        });
+    }
+
+    if (data.reason) {
+        alerts.push({
+            title: "AI detection reason",
+            message: data.reason,
+            time: "NOW"
+        });
+    }
+
+    alerts.forEach(alert => {
+
+        const alertItem = document.createElement("div");
+
+        alertItem.className = "alert-item";
+
+        alertItem.innerHTML = `
+            <span class="alert-indicator"></span>
+
+            <div>
+                <strong>${alert.title}</strong>
+                <p>${alert.message}</p>
+            </div>
+
+            <span class="alert-time">${alert.time}</span>
+        `;
+
+        alertList.appendChild(alertItem);
+    });
+
+    if (alertCount) {
+        alertCount.textContent = String(alerts.length).padStart(2, "0");
+    }
+}
+
+
+createRiskAlert(riskData);
