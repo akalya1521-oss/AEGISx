@@ -14,5 +14,12 @@ def predict_risk(data):
     return {
         "risk_score": risk_score,
         "risk_level": risk_level,
-        "priority": priority
+        "priority": priority,
+        "reason": "Multiple suspicious indicators detected"
     }
+
+
+result = predict_risk(None)
+
+print("Prediction result:")
+print(result)
