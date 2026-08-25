@@ -3,11 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routes.analysis import router as analysis_router
 
+
 app = FastAPI(
     title="AEGISx API",
-    description="AI-powered Cybercrime Network Analysis API",
+    description="AI-powered Cybercrime Network Analysis System",
     version="1.0.0"
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,7 +19,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(analysis_router)
+
+app.include_router(
+    analysis_router
+)
 
 
 @app.get("/")

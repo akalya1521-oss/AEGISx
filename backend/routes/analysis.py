@@ -62,7 +62,6 @@ def analyze(request: AnalysisRequest):
         if keyword in text
     ]
 
-    # Determine risk level
     if any(
         word in detected_keywords
         for word in ["ransomware", "botnet", "ddos"]
@@ -80,9 +79,7 @@ def analyze(request: AnalysisRequest):
 
     relationships: List[Relationship] = []
 
-    # Botnet → DDoS
     if "botnet" in detected_keywords and "ddos" in detected_keywords:
-
         relationships.append(
             Relationship(
                 source="Botnet",
@@ -93,9 +90,7 @@ def analyze(request: AnalysisRequest):
             )
         )
 
-    # Phishing → Credentials
     if "phishing" in detected_keywords and "credential" in detected_keywords:
-
         relationships.append(
             Relationship(
                 source="Phishing",
@@ -106,7 +101,6 @@ def analyze(request: AnalysisRequest):
             )
         )
 
-    # Create graph nodes and edges
     nodes: List[GraphNode] = []
     edges: List[GraphEdge] = []
 
@@ -134,7 +128,6 @@ def analyze(request: AnalysisRequest):
             )
         )
 
-    # Remove duplicate nodes
     unique_nodes = {
         node.id: node
         for node in nodes

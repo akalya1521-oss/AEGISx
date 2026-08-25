@@ -1,92 +1,106 @@
-import React from 'react';
-import { Cpu, ShieldAlert, CheckCircle, ArrowRight, ShieldCheck } from 'lucide-react';
-import { mockAIAnalysis } from '../data/aiAnalysis';
-import { useIntelligence } from '../context/IntelligenceContext';
-import '../styles/components.css';
+import { useState } from "react";
+import { analyzeText, AnalysisResponse } from "../api";
 
-export const AIAnalysis: React.FC = () => {
-  const { isolateNode, addToast } = useIntelligence();
+export default function AIAnalysis() {
+  const [text, setText] = useState("");
+  const [result, setResult] = useState<AnalysisResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleExecuteMitigation = () => {
-    mockAIAnalysis.criticalNodesToIsolate.forEach(nodeId => {
-      isolateNode(nodeId);
-    });
-    addToast({
-      title: 'DEFENSIVE COUNTERMEASURES EXECUTED',
-      message: `Quarantine applied across ${mockAIAnalysis.criticalNodesToIsolate.length} compromised nodes.`,
-      type: 'critical'
-    });
+  const handleAnalyze = async () => {
+    if (!text.trim()) {
+      setError("Please enter some text to analyze.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setResult(null);
+
+    try {
+      const data = await analyzeText(text);
+      setResult(data);
+    } catch (err) {
+      console.error(err);
+      setError(
+        "Unable to connect to the AEGISx backend. Make sure FastAPI is running on port 8001."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="cyber-panel ai-analysis-panel">
-      <div className="cyber-panel-header" style={{ borderBottomColor: 'rgba(0, 240, 255, 0.2)' }}>
-        <div className="cyber-panel-title">
-          <Cpu size={16} color="var(--accent-cyan)" />
-          <span>CIPHER-AI // Automated Intelligence Synthesis</span>
-        </div>
-        <div className="ai-header-tag">
-          CONFIDENCE: {mockAIAnalysis.confidenceScore}%
-        </div>
-      </div>
+    <div className="ai-analysis">
+      <h2>AI Cybercrime Analysis</h2>
 
-      <div className="cyber-panel-body">
-        {/* Headline */}
-        <h4 className="ai-headline">
-          {mockAIAnalysis.headline}
-        </h4>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Enter cybercrime information..."
+        rows={6}
+      />
 
-        {/* Observation Block */}
-        <div className="ai-observation-box">
-          <p>{mockAIAnalysis.keyObservation}</p>
+      <button onClick={handleAnalyze} disabled={loading}>
+        {loading ? "Analyzing..." : "Analyze"}
+      </button>
+
+      {error && (
+        <p style={{ color: "red" }}>
+          {error}
+        </p>
+      )}
+
+      {result && (
+        <div className="analysis-result">
+
+          <h3>Analysis Result</h3>
+
+          <p>
+            <strong>Risk Level:</strong>{" "}
+            <span>{result.risk_level}</span>
+          </p>
+
+          <h4>Detected Keywords</h4>
+
+          {result.detected_keywords.length > 0 ? (
+            <ul>
+              {result.detected_keywords.map((keyword) => (
+                <li key={keyword}>{keyword}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>No cybercrime keywords detected.</p>
+          )}
+
+          <h4>Relationships</h4>
+
+          {result.relationships.length > 0 ? (
+            <ul>
+              {result.relationships.map((relationship, index) => (
+                <li key={index}>
+                  <strong>{relationship.source}</strong>{" "}
+                  → {relationship.relationship} →{" "}
+                  <strong>{relationship.target}</strong>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No relationships detected.</p>
+          )}
+
+          <h4>Graph Data</h4>
+
+          <p>
+            Nodes: {result.graph.nodes.length}
+          </p>
+
+          <p>
+            Edges: {result.graph.edges.length}
+          </p>
+
         </div>
-
-        {/* Attribution & Anomalies */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
-          <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '8px 12px', borderRadius: 4, border: '1px solid var(--border-subtle)' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-dim)', textTransform: 'uppercase' }}>
-              PRIMARY THREAT ACTOR
-            </span>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, color: 'var(--danger-red)' }}>
-              {mockAIAnalysis.primaryThreatActor}
-            </div>
-          </div>
-
-          <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '8px 12px', borderRadius: 4, border: '1px solid var(--border-subtle)' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-dim)', textTransform: 'uppercase' }}>
-              ANOMALIES CORRELATED
-            </span>
-            <div style={{ fontFamily: 'var(--font-orbitron)', fontSize: 14, fontWeight: 800, color: 'var(--accent-cyan)' }}>
-              {mockAIAnalysis.anomaliesDetected} DETECTED
-            </div>
-          </div>
-        </div>
-
-        {/* Action Callout */}
-        <div className="ai-action-callout">
-          <ShieldAlert size={18} style={{ flexShrink: 0, marginTop: 2 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 11, letterSpacing: '0.06em' }}>
-              RECOMMENDED DEFENSIVE ACTION
-            </span>
-            <span>{mockAIAnalysis.suggestedAction}</span>
-            <div style={{ marginTop: 8 }}>
-              <button 
-                className="cyber-btn cyber-btn-danger cyber-btn-sm"
-                onClick={handleExecuteMitigation}
-              >
-                <span>Execute Emergency Isolation</span>
-                <ArrowRight size={12} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Timestamp */}
-        <div style={{ marginTop: 12, fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--text-dim)' }}>
-          {mockAIAnalysis.timestamp}
-        </div>
-      </div>
+      )}
     </div>
   );
-};
+}
