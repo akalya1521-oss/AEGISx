@@ -11,7 +11,7 @@ from src.graph.loader import build_network
 from src.graph.network import CriminalNetwork
 from src.graph.pdf_report import build_case_report
 from src.graph.storage import NetworkStorage
-from src.graph.intelligence import risk_assessment, explain_risk
+from src.graph.intelligence import risk_assessment, explain_risk, suspicious_patterns
 from src.graph.analysis import (
     most_connected_nodes,
     find_clusters,
@@ -19,6 +19,7 @@ from src.graph.analysis import (
     find_connection,
     centrality_analysis
 )
+from src.graph.intelligence import risk_assessment
 from src.graph.timeline import add_event, get_events
 app = FastAPI(title="Criminal Network Analysis API")
 
@@ -185,8 +186,72 @@ def connection(node1: str, node2: str):
             node2
         )
     }
-   @app.get("/analysis/timeline")
+@app.get("/analysis/timeline")
 def timeline():
     return {
         "events": get_events()
-    }c
+    }
+@app.get("/analysis/entity/{node_id}")
+def entity_profile(node_id: str):
+    if node_id not in network.graph:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Entity '{node_id}' not found"
+        )
+
+    node = network.graph.nodes[node_id]
+    risks = risk_assessment(network.graph)
+
+    risk = next(
+        (item for item in risks if item["id"] == node_id),
+        None
+    )
+
+    connections = []
+
+    for neighbor in network.graph.neighbors(node_id):
+        edge = network.graph[node_id][neighbor]
+
+        connections.append({
+            "id": neighbor,
+            "name": network.graph.nodes[neighbor].get("name", neighbor),
+            "type": network.graph.nodes[neighbor].get("type", "Unknown"),
+            "relationship": edge.get("relation", "linked")
+        })
+
+    degree_rank = sorted(
+        network.graph.degree(),
+        key=lambda item: item[1],
+        reverse=True
+    )
+
+    rank = next(
+        index + 1
+        for index, (entity_id, _) in enumerate(degree_rank)
+        if entity_id == node_id
+    )
+
+    # Get timeline events related to this entity
+    events = get_events()
+
+    related_events = [
+        event for event in events
+        if node_id.lower() in str(event).lower()
+        or node.get("name", "").lower() in str(event).lower()
+    ]
+
+    return {
+        "id": node_id,
+        "name": node.get("name", node_id),
+        "type": node.get("type", "Unknown"),
+        "connections": connections,
+        "connection_count": network.graph.degree(node_id),
+        "influence_rank": rank,
+        "risk": risk,
+        "recent_activity": related_events[:5]
+    }
+@app.get("/analysis/patterns")
+def patterns():
+    return {
+        "patterns": suspicious_patterns(network.graph)
+    }

@@ -2,6 +2,12 @@ const svg = document.querySelector('#network');
 const details = document.querySelector('#details');
 const insights = document.querySelector('#insights');
 const timeline = document.querySelector('#timeline');
+const patterns = document.querySelector('#patterns');
+const overallRisk = document.querySelector('#overall-risk');
+const keyEntity = document.querySelector('#key-entity');
+const mainBridge = document.querySelector('#main-bridge');
+const clusterCountElement = document.querySelector('#cluster-count');
+const patternCount = document.querySelector('#pattern-count');
 const entityForm = document.querySelector('#entity-form');
 const relationshipForm = document.querySelector('#relationship-form');
 const pathForm = document.querySelector('#path-form');
@@ -170,69 +176,112 @@ function render() {
   svg.innerHTML = content.join('') + '</g>';
 }
 
-function select(id) {
+async function select(id) {
   state.selected = id;
 
-  const node = state.nodes.find(
-    n => n.id === id
-  );
+  const node = state.nodes.find(n => n.id === id);
 
   if (!node) return;
 
-  const links = state.edges.filter(
-    e => e.source === id || e.target === id
-  );
-
-  const risk = state.risk.find(
-    item => item.id === id
-  );
-
   details.innerHTML = `
-    <h2>Selection</h2>
-
-    <p>
-      <strong>${escape(node.name || node.id)}</strong>
-      <br>
-      ${escape(node.id)}
-      ·
-      ${escape(node.type || 'Unknown')}
-      <br><br>
-      ${links.length}
-      direct connection${links.length === 1 ? '' : 's'}
-    </p>
-
-    ${
-      risk
-        ? `
-          <div class="selected-risk">
-            <strong>Risk assessment</strong>
-
-            <p>
-              Score:
-              <strong>${risk.score}/100</strong>
-            </p>
-
-            <p>
-              Level:
-              <strong>${escape(risk.level)}</strong>
-            </p>
-
-            <p>
-              Connectivity:
-              ${risk.connectivity_score}/100
-            </p>
-
-            <p>
-              Bridge influence:
-              ${risk.bridge_influence}/100
-            </p>
-          </div>
-        `
-        : ''
-    }
+    <h2>Entity Intelligence Profile</h2>
+    <p>Loading intelligence for <strong>${escape(node.name || id)}</strong>...</p>
   `;
 
   render();
+
+  try {
+    const response = await fetch(
+      `/analysis/entity/${encodeURIComponent(id)}`,
+      { cache: 'no-store' }
+    );
+
+    const profile = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        profile.detail || 'Unable to load entity intelligence.'
+      );
+    }
+
+    const risk = profile.risk || {};
+    const activities = profile.recent_activity || [];
+
+    details.innerHTML = `
+      <h2>Entity Intelligence Profile</h2>
+
+      <p>
+        <strong>${escape(profile.name)}</strong><br>
+        ${escape(profile.id)} · ${escape(profile.type)}
+      </p>
+
+      <div class="selected-risk">
+        <strong>Risk assessment</strong>
+
+        <p>Score: <strong>${risk.score ?? 0}/100</strong></p>
+
+        <p>Level: <strong>${escape(risk.level ?? 'Unknown')}</strong></p>
+
+        <p>Connectivity: ${risk.connectivity_score ?? 0}/100</p>
+
+        <p>Bridge influence: ${risk.bridge_influence ?? 0}/100</p>
+
+        <p>
+          Direct connections:
+          <strong>${profile.connection_count}</strong>
+        </p>
+
+        <p>
+          Influence rank:
+          <strong>#${profile.influence_rank}</strong>
+        </p>
+      </div>
+
+      <h3>Connected to</h3>
+
+      ${
+        profile.connections.length
+          ? `
+            <div class="profile-connections">
+              ${profile.connections.map(connection => `
+                <div class="profile-connection">
+                  <strong>${escape(connection.name)}</strong>
+                  <span>
+                    ${escape(connection.id)}
+                    · ${escape(connection.relationship)}
+                  </span>
+                </div>
+              `).join('')}
+            </div>
+          `
+          : '<p>No direct connections found.</p>'
+      }
+
+      <h3 class="activity-heading">Recent activity</h3>
+
+      ${
+        activities.length
+          ? `
+            <div class="profile-activity">
+              ${activities.map(event => `
+                <div class="profile-event">
+                  <strong>${escape(event.type || 'INTELLIGENCE')}</strong>
+                  <span>${escape(event.time || '')}</span>
+                  <p>${escape(event.message || '')}</p>
+                </div>
+              `).join('')}
+            </div>
+          `
+          : '<p class="no-activity">No recent activity for this entity.</p>'
+      }
+    `;
+
+  } catch (error) {
+    details.innerHTML = `
+      <h2>Entity Intelligence Profile</h2>
+      <p>${escape(error.message)}</p>
+    `;
+  }
 }
 
 function renderInsights(centrality, clusters, risks) {
@@ -477,7 +526,95 @@ async function submitForm(form, url) {
     submit.disabled = false;
   }
 }
+function renderPatterns(items) {
+  if (!items.length) {
+    patterns.innerHTML = `
+      <h2>Suspicious patterns</h2>
+      <p>No suspicious patterns detected.</p>
+    `;
+    return;
+  }
 
+  patterns.innerHTML = `
+    <h2>Suspicious patterns</h2>
+
+    <div class="patterns-list">
+      ${items.map(item => {
+        const node = state.nodes.find(n => n.id === item.entity);
+
+        return `
+          <button
+            class="pattern-item pattern-${item.severity.toLowerCase()}"
+            type="button"
+            data-id="${escape(item.entity)}"
+          >
+            <strong>${escape(item.type)}</strong>
+
+            <span class="pattern-severity">
+              ${escape(item.severity)}
+            </span>
+
+            <span>
+              ${escape(node?.name || item.entity)}
+            </span>
+
+            <small>${escape(item.message)}</small>
+          </button>
+        `;
+      }).join('')}
+    </div>
+  `;
+
+  patterns.querySelectorAll('[data-id]').forEach(button => {
+    button.addEventListener('click', () => {
+      select(button.dataset.id);
+    });
+  });
+}
+function renderIntelligenceSummary(centrality, clusters, risks, patternItems) {
+  const ranked = Object.entries(centrality)
+    .sort(
+      ([, a], [, b]) =>
+        b.degree - a.degree ||
+        b.betweenness - a.betweenness
+    );
+
+  const key = ranked[0];
+  const bridge = [...Object.entries(centrality)]
+    .sort(([, a], [, b]) => b.betweenness - a.betweenness)[0];
+
+  const highRisk = risks.filter(
+    item => item.level === 'High'
+  ).length;
+
+  const mediumRisk = risks.filter(
+    item => item.level === 'Medium'
+  ).length;
+
+  const overall =
+    highRisk > 0
+      ? 'HIGH'
+      : mediumRisk > 0
+        ? 'MEDIUM'
+        : 'LOW';
+
+  const keyNode = key
+    ? state.nodes.find(n => n.id === key[0])
+    : null;
+
+  const bridgeNode = bridge
+    ? state.nodes.find(n => n.id === bridge[0])
+    : null;
+
+  overallRisk.textContent = overall;
+  keyEntity.textContent = keyNode?.name || key?.[0] || '—';
+  mainBridge.textContent = bridgeNode?.name || bridge?.[0] || '—';
+  clusterCountElement.textContent = clusters.length;
+  patternCount.textContent = patternItems.length;
+
+  overallRisk.className =
+    `summary-risk risk-${overall.toLowerCase()}`;
+}
 async function refresh() {
   try {
     const [
@@ -485,7 +622,8 @@ async function refresh() {
       centralityResponse,
       clustersResponse,
       riskResponse,
-      timelineResponse
+      timelineResponse,
+      patternsResponse
     ] = await Promise.all([
       fetch('/network', {
         cache: 'no-store'
@@ -501,21 +639,27 @@ async function refresh() {
 
       fetch('/analysis/risk', {
         cache: 'no-store'
+      }),
+
+      fetch('/analysis/timeline', {
+        cache: 'no-store'
+      }),
+      fetch('/analysis/patterns', {
+        cache: 'no-store'
       })
-    ]),
-    fetch('/analysis/timeline', {
-  cache: 'no-store'
-});
+    ]);
 
     if (
       ![
         networkResponse,
         centralityResponse,
         clustersResponse,
-        riskResponse
+        riskResponse,
+        timelineResponse,
+        patternsResponse
       ].every(response => response.ok)
     ) {
-      throw new Error();
+      throw new Error('Unable to load intelligence data.');
     }
 
     const [
@@ -523,13 +667,15 @@ async function refresh() {
       centrality,
       clusterData,
       riskData,
-      timelineData
+      timelineData,
+      patternsData
     ] = await Promise.all([
       networkResponse.json(),
       centralityResponse.json(),
       clustersResponse.json(),
       riskResponse.json(),
-      timelineResponse.json()
+      timelineResponse.json(),
+      patternsResponse.json()
     ]);
 
     const previous = new Map(
@@ -546,49 +692,50 @@ async function refresh() {
     state.edges = data.edges;
     state.risk = riskData.entities || [];
 
-    document.querySelector(
-      '#entity-count'
-    ).textContent = state.nodes.length;
+    document.querySelector('#entity-count').textContent =
+      state.nodes.length;
 
-    document.querySelector(
-      '#relationship-count'
-    ).textContent = state.edges.length;
+    document.querySelector('#relationship-count').textContent =
+      state.edges.length;
 
-    document.querySelector(
-      '#type-count'
-    ).textContent =
-      new Set(
-        state.nodes.map(n => n.type)
-      ).size;
+    document.querySelector('#type-count').textContent =
+      new Set(state.nodes.map(n => n.type)).size;
 
-    document.querySelector(
-      '#network-summary'
-    ).textContent =
+    document.querySelector('#network-summary').textContent =
       `${state.nodes.length} entities · ${state.edges.length} relationships`;
 
-    document.querySelector(
-      '#updated-at'
-    ).textContent =
+    document.querySelector('#updated-at').textContent =
       `updated ${new Date().toLocaleTimeString()}`;
 
     render();
 
     renderInsights(
       centrality,
-      clusterData.clusters,
+      clusterData.clusters || [],
       state.risk
     );
-    renderTimeline(timelineData.events || []);
+
+    renderTimeline(
+      timelineData.events || []
+    );
+    renderPatterns(
+      patternsData.patterns || []
+    );
+    renderIntelligenceSummary(
+      centrality,
+      clusterData.clusters,
+      state.risk,
+      patternsData.patterns || []
+    );
     populateEntityChoices();
 
-  } catch {
-    document.querySelector(
-      '#updated-at'
-    ).textContent =
+  } catch (error) {
+    console.error('Dashboard refresh error:', error);
+
+    document.querySelector('#updated-at').textContent =
       'reconnecting…';
   }
 }
-
 svg.addEventListener(
   'pointerdown',
   e => {

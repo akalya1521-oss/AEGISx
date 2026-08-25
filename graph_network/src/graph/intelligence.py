@@ -170,3 +170,60 @@ def network_summary(graph):
         "connected_groups": nx.number_connected_components(graph),
         "density": round(nx.density(graph), 3)
     }
+def suspicious_patterns(graph):
+    if graph.number_of_nodes() == 0:
+        return []
+
+    degree = nx.degree_centrality(graph)
+    betweenness = nx.betweenness_centrality(graph)
+
+    patterns = []
+
+    for node in graph.nodes():
+        name = graph.nodes[node].get("name", node)
+        connections = graph.degree(node)
+
+        # High connectivity hub
+        if degree[node] >= 0.5:
+            patterns.append({
+                "type": "High-connectivity hub",
+                "severity": "High",
+                "entity": node,
+                "message": f"{name} has {connections} direct connections"
+            })
+
+        # Bridge entity
+        if betweenness[node] >= 0.3:
+            patterns.append({
+                "type": "Network bridge",
+                "severity": "High",
+                "entity": node,
+                "message": f"{name} connects otherwise separated parts of the network"
+            })
+
+        # Moderate connector
+        elif degree[node] >= 0.3:
+            patterns.append({
+                "type": "Key connector",
+                "severity": "Medium",
+                "entity": node,
+                "message": f"{name} has {connections} network connections"
+            })
+
+        # Financial relationship
+        for neighbor in graph.neighbors(node):
+            relation = graph[node][neighbor].get("relation", "").lower()
+            neighbor_type = graph.nodes[neighbor].get("type", "")
+
+            if (
+                relation == "owns"
+                and neighbor_type == "Bank Account"
+            ):
+                patterns.append({
+                    "type": "Financial connection",
+                    "severity": "Medium",
+                    "entity": node,
+                    "message": f"{name} is connected to bank account {neighbor}"
+                })
+
+    return patterns
