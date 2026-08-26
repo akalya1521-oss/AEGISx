@@ -27,6 +27,7 @@ export interface AnalysisResponse {
   input: string;
   status: string;
   risk_level: string;
+  risk_score: number;
   detected_keywords: string[];
   relationships: Relationship[];
   graph: {
@@ -38,24 +39,40 @@ export interface AnalysisResponse {
 export async function analyzeText(
   text: string
 ): Promise<AnalysisResponse> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/analysis/analyze`,
-    {
+  const url = `${API_BASE_URL}/api/analysis/analyze`;
+
+  console.log("AEGISx: Sending request to:", url);
+
+  try {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept": "application/json",
       },
       body: JSON.stringify({
-        text,
+        text: text.trim(),
       }),
+    });
+
+    console.log("AEGISx: Backend response:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+
+      throw new Error(
+        `Backend returned ${response.status}: ${errorText}`
+      );
     }
-  );
 
-  if (!response.ok) {
-    throw new Error(
-      `Analysis failed: ${response.status} ${response.statusText}`
-    );
+    const data: AnalysisResponse = await response.json();
+
+    console.log("AEGISx: Analysis result:", data);
+
+    return data;
+  } catch (error) {
+    console.error("AEGISx API ERROR:", error);
+
+    throw error;
   }
-
-  return response.json();
 }
