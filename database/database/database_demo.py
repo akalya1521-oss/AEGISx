@@ -14,6 +14,7 @@ cursor = connection.cursor()
 cursor.execute("DROP TABLE IF EXISTS threat_logs")
 
 # Create new threat_logs table
+
 cursor.execute("""
 CREATE TABLE threat_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
